@@ -1,0 +1,35 @@
+#!/bin/bash -x
+
+CONFIG=$1
+MGR=$2
+OPS_ARG=$3
+shift
+shift
+
+if [[ "$CONFIG" = "" ]]; then
+  echo "please set alias \`alias [package manager]='rpkg [config path] [package manager]'\` if you want to use rpkg."
+  exit 1
+fi
+DB_PATH=`cat $CONFIG |grep ${MGR}_data| awk -F':' '{print $2}'`
+BLACKLIST_PATH=`cat $CONFIG |grep ${MGR}_blacklist | awk -F':' '{print $2}'`
+OPS=`cat $CONFIG | grep $OPS_ARG |awk -F'_' '{print $2}' |awk -F': ' '{print $1}'`
+echo $@ |sed 's/ /\n/g' | sort | uniq | while read line
+do
+  cat $BLACKLIST_PATH|grep $line > /dev/null 2>&1 && continue
+  echo $line >> /tmp/rpkg
+done
+$MGR $@
+if [[ "$?" = "0" ]]; then
+  if [[ "$OPS" = "install" ]]; then
+    cat /tmp/rpkg >> $DB_PATH
+  fi
+  if [[ "$OPS" = "remove" ]]; then
+    cat /tmp/rpkg | sort | uniq | while read line; do
+      sed -i "/^$line$/d" $DB_PATH
+    done
+  fi
+fi
+rm -f /tmp/rpkg
+cat $DB_PATH |sort |uniq > /tmp/rpkg
+cp /tmp/rpkg $DB_PATH
+rm -f /tmp/rpkg

@@ -1,0 +1,1 @@
+list search install update upgrade remove autoremove -f -y

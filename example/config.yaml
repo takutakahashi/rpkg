@@ -1,0 +1,4 @@
+apt_install: "install"
+apt_remove: "remove purge"
+apt_data: /home/user/.config/apt_db
+apt_blacklist: /home/user/.config/apt_blacklist
