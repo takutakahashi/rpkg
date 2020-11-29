@@ -1,0 +1,4 @@
+cmd_install: "install"
+cmd_remove: "remove purge"
+data: /home/user/.config/apt_db
+blacklist: /home/user/.config/apt_blacklist

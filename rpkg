@@ -10,8 +10,16 @@ if [[ "$CONFIG" = "" ]]; then
   echo "please set alias \`alias [package manager]='rpkg [config path] [package manager]'\` if you want to use rpkg."
   exit 1
 fi
-DB_PATH=`cat $CONFIG |grep ${MGR}_data| awk -F':' '{print $2}'`
-BLACKLIST_PATH=`cat $CONFIG |grep ${MGR}_blacklist | awk -F':' '{print $2}'`
+DB_PATH=`cat $CONFIG |grep data| awk -F':' '{print $2}'`
+BLACKLIST_PATH=`cat $CONFIG |grep blacklist | awk -F':' '{print $2}'`
+if ! ls $DB_PATH >/dev/null 2>&1; then
+   echo "[rpkg] data path is invalid."
+   exit 1
+fi
+if ! ls $BLACKLIST_PATH >/dev/null 2>&1; then
+   echo "[rpkg] blacklist path is invalid."
+   exit 1
+fi
 OPS=`cat $CONFIG | grep $OPS_ARG |awk -F'_' '{print $2}' |awk -F': ' '{print $1}'`
 echo $@ |sed 's/ /\n/g' | sort | uniq | while read line
 do
